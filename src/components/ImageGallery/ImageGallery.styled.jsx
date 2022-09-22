@@ -1,7 +1,6 @@
-import styled from '@emotion/styled'
+import styled from '@emotion/styled';
 
-
-const ImageGalleryContainer =styled.ul`
+const ImageGalleryContainer = styled.ul`
   display: grid;
   max-width: calc(100vw - 48px);
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -12,17 +11,6 @@ const ImageGalleryContainer =styled.ul`
   list-style: none;
   margin-left: auto;
   margin-right: auto;
-    
-`
+`;
 
-const NoImage= styled.div`
-  text-align: center;
-  margin-left: auto;
-  margin-right: auto;
-  padding: 15px;
-  font-size: 27px;
-  font-weight: 700;
-
-`
-
-export {ImageGalleryContainer, NoImage}
+export { ImageGalleryContainer };
