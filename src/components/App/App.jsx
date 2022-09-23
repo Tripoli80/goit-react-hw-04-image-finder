@@ -23,9 +23,7 @@ export class App extends Component {
     tags: '',
     totalHits: 0,
   };
-  componentDidMount() {
-    // this.fetchPost();
-  }
+
   componentDidUpdate(_, prevState) {
     const prewPage = prevState.page;
     const prevQwery = prevState.qwery;
@@ -38,13 +36,8 @@ export class App extends Component {
     if (inputEmpty) {
       return;
     }
-    if (prevQwery !== currentQwery) {
-      this.setState({ hits: [], page: 1, qwery: currentQwery });
-      this.fetchPost({ page: 1, qwery: currentQwery });
-      return;
-    }
-    // если сотояние номера страници или  запроса изменилось - новый запрос
-    if (prewPage !== currentPage) {
+
+    if (prewPage !== currentPage || prevQwery !== currentQwery) {
       this.fetchPost({ page: currentPage, qwery: currentQwery });
       return;
     }
@@ -94,7 +87,11 @@ export class App extends Component {
   };
 
   onSubmit = newName => {
-    this.setState({ qwery: newName });
+    const { qwery } = this.state;
+    if (qwery !== newName) {
+      console.log('first', qwery, newName);
+      this.setState({ hits: [], page: 1, qwery: newName });
+    }
   };
 
   render() {
@@ -104,12 +101,12 @@ export class App extends Component {
     const btnActive = hits.length >= totalHits;
     const errorMassage = error && !isLoading;
     const inputEmpty = !Boolean(qwery.trim(' '));
-    const isHits = Boolean(hits.length)&&!inputEmpty;
+    const isHits = Boolean(hits.length) && !inputEmpty;
 
     const noImageMassege = !inputEmpty && !isHits && !error && !isLoading;
 
     return (
-      <Appdiv>  
+      <Appdiv>
         <Searchbar onSubmit={onSubmit} />
         {isLoading && <Loader />}
         {modalOpen && <Popap src={src} tags={tags} onClose={onCloseModal} />}
