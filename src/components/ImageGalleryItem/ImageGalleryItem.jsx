@@ -3,14 +3,13 @@ import { ItemImg, Img } from './ImageGalleryItem.styled';
 
 export default class ImageGalleryItem extends Component {
   render() {
-    const { webformatURL} = this.props.hit;
-    const index = this.props.index;
-    const onClick = this.props.onClick;
-    return (
+    const { webformatURL, tags} = this.props.hit;
+    const {index, onClick }= this.props;
+      return (
       <ItemImg>
         <Img
           src={webformatURL}
-          alt=""
+          alt={tags}
           data-index={index}
           onClick={() => onClick(index)}
         />

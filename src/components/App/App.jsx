@@ -73,10 +73,9 @@ export class App extends Component {
 
   // тут хочу открыть модалку
   onOpenModal = index => {
-    const src = this.state.hits[index].largeImageURL;
-    const tags = this.state.hits[index].tags;
+    const { largeImageURL, tags } = this.state.hits[index];
     this.setState(state => {
-      return { modalOpen: !state.modalOpen, src: src, tags: tags };
+      return { modalOpen: !state.modalOpen, src: largeImageURL, tags: tags };
     });
   };
 
@@ -89,10 +88,10 @@ export class App extends Component {
   onSubmit = newName => {
     const { qwery } = this.state;
     if (qwery !== newName) {
-      console.log('first', qwery, newName);
       this.setState({ hits: [], page: 1, qwery: newName });
     }
   };
+  getErrorText = () => {};
 
   render() {
     const { isLoading, hits, error, modalOpen, src, tags, qwery, totalHits } =
@@ -102,21 +101,22 @@ export class App extends Component {
     const errorMassage = error && !isLoading;
     const inputEmpty = !Boolean(qwery.trim(' '));
     const isHits = Boolean(hits.length) && !inputEmpty;
-
     const noImageMassege = !inputEmpty && !isHits && !error && !isLoading;
+    let msg;
+    if (errorMassage) msg = '..... щось пішло не так ......   ';
+    if (inputEmpty) msg = `Введіть щось для пошуку....`;
+    if (noImageMassege) msg = `За запитом " ${qwery} " Нічого не знайдено....`;
 
     return (
       <Appdiv>
         <Searchbar onSubmit={onSubmit} />
         {isLoading && <Loader />}
-        {modalOpen && <Popap src={src} tags={tags} onClose={onCloseModal} />}
-        {errorMassage && <NoImage>{'..... щось не так ......   '}</NoImage>}
-        {inputEmpty && <NoImage>{`Введіть щось для пошуку....`}</NoImage>}{' '}
-        {noImageMassege && (
-          <NoImage>{`За запитом " ${qwery} " Нічого не знайдено....`}</NoImage>
+        {(errorMassage || inputEmpty || noImageMassege) && (
+          <NoImage>{`${msg}`}</NoImage>
         )}
         {isHits && <ImageGallery hits={hits} onOpenModal={onOpenModal} />}
         {isHits && <Button disabled={btnActive} onClick={loadMore} />}
+        {modalOpen && <Popap src={src} tags={tags} onClose={onCloseModal} />}
       </Appdiv>
     );
   }

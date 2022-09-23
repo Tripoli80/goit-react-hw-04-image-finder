@@ -19,5 +19,8 @@ const Modal = styled.div`
 
 const Img = styled.img`
 
+
+
+
 `;
 export { Overlay, Modal, Img };
