@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import { useEffect, useState } from 'react';
 
 import './styles.css';
 import { getHits } from 'helpers/post';
@@ -11,46 +11,35 @@ import { ImageGallery } from 'components/ImageGallery/ImageGallery';
 import Button from 'components/Button/Button';
 import Popap from 'components/Modal/Modal';
 
-export class App extends Component {
-  state = {
-    qwery: '',
-    hits: [],
-    page: 1,
-    error: null,
-    isLoading: false,
-    modalOpen: false,
-    src: '',
-    tags: '',
-    totalHits: 0,
-  };
+export const App = () => {
+  const [qwery, setQwery] = useState('');
+  const [hits, setHits] = useState([]);
+  const [page, setPage] = useState(1);
+  const [error, setError] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [src, setSrc] = useState('');
+  const [tags, setTags] = useState('');
+  const [totalHits, setTotalHits] = useState(0);
 
-  componentDidUpdate(_, prevState) {
-    const prewPage = prevState.page;
-    const prevQwery = prevState.qwery;
-
-    const currentPage = this.state.page;
-    const currentQwery = this.state.qwery;
-
-    const inputEmpty = !Boolean(currentQwery.trim(' '));
+  useEffect(() => {
+    const inputEmpty = !Boolean(qwery.trim(' '));
     //смотрю быль ли запрос новый из вне и если да вношу в стейт чем вызываю перезапус этой функции
     if (inputEmpty) {
       return;
     }
+    console.log('sent new post');
+    fetchPost({ page: page, qwery: qwery });
+  }, [qwery, page]);
 
-    if (prewPage !== currentPage || prevQwery !== currentQwery) {
-      this.fetchPost({ page: currentPage, qwery: currentQwery });
-      return;
-    }
-  }
-
-  loadMore = () => {
-    this.setState(prevState => {
-      return { page: prevState.page + 1 };
+  const loadMore = () => {
+    setPage(prevState => {
+      return prevState + 1;
     });
   };
 
-  fetchPost = async ({ page, qwery }) => {
-    this.setState({ isLoading: true });
+  const fetchPost = async ({ page, qwery }) => {
+    setIsLoading(true);
 
     try {
       const { hitsUpdate, totalHits } = await getHits({
@@ -60,64 +49,61 @@ export class App extends Component {
       if (!hitsUpdate) {
         throw new Error();
       }
-      this.setState(({ hits }) => {
-        const newHits = [...hits, ...hitsUpdate];
-        return { hits: newHits, totalHits: totalHits };
+      setHits(prevHits => {
+        const newHits = [...prevHits, ...hitsUpdate];
+        return newHits;
       });
+      setTotalHits(totalHits);
     } catch (error) {
-      this.setState({ error: true });
+      setError(true);
     } finally {
-      this.setState({ isLoading: false });
+      setIsLoading(false);
     }
   };
 
   // тут хочу открыть модалку
-  onOpenModal = index => {
-    const { largeImageURL, tags } = this.state.hits[index];
-    this.setState(state => {
-      return { modalOpen: !state.modalOpen, src: largeImageURL, tags: tags };
-    });
+  const onOpenModal = index => {
+    const { largeImageURL, tags } = hits[index];
+
+    setModalOpen(prevMO => !prevMO);
+    setSrc(largeImageURL);
+    setTags(tags);
   };
 
-  onCloseModal = () => {
-    this.setState(state => {
-      return { modalOpen: !state.modalOpen, src: '', tags: '' };
-    });
+  const onCloseModal = () => {
+    setModalOpen(prevMO => !prevMO);
+    setSrc('');
+    setTags('');
   };
 
-  onSubmit = newName => {
-    const { qwery } = this.state;
+  const onSubmit = newName => {
+    console.log('newName', newName, qwery);
     if (qwery !== newName) {
-      this.setState({ hits: [], page: 1, qwery: newName });
+      setQwery(newName);
+      setHits([]);
+      setPage(1);
     }
   };
-  getErrorText = () => {};
+  const btnActive = hits.length >= totalHits;
+  const errorMassage = error && !isLoading;
+  const inputEmpty = !Boolean(qwery.trim(' '));
+  const isHits = Boolean(hits.length) && !inputEmpty;
+  const noImageMassege = !inputEmpty && !isHits && !error && !isLoading;
+  let msg;
+  if (errorMassage) msg = '..... щось пішло не так ......   ';
+  if (inputEmpty) msg = `Введіть щось для пошуку....`;
+  if (noImageMassege) msg = `За запитом " ${qwery} " Нічого не знайдено....`;
 
-  render() {
-    const { isLoading, hits, error, modalOpen, src, tags, qwery, totalHits } =
-      this.state;
-    const { loadMore, onCloseModal, onSubmit, onOpenModal } = this;
-    const btnActive = hits.length >= totalHits;
-    const errorMassage = error && !isLoading;
-    const inputEmpty = !Boolean(qwery.trim(' '));
-    const isHits = Boolean(hits.length) && !inputEmpty;
-    const noImageMassege = !inputEmpty && !isHits && !error && !isLoading;
-    let msg;
-    if (errorMassage) msg = '..... щось пішло не так ......   ';
-    if (inputEmpty) msg = `Введіть щось для пошуку....`;
-    if (noImageMassege) msg = `За запитом " ${qwery} " Нічого не знайдено....`;
-
-    return (
-      <Appdiv>
-        <Searchbar onSubmit={onSubmit} />
-        {isLoading && <Loader />}
-        {(errorMassage || inputEmpty || noImageMassege) && (
-          <NoImage>{`${msg}`}</NoImage>
-        )}
-        {isHits && <ImageGallery hits={hits} onOpenModal={onOpenModal} />}
-        {isHits && <Button disabled={btnActive} onClick={loadMore} />}
-        {modalOpen && <Popap src={src} tags={tags} onClose={onCloseModal} />}
-      </Appdiv>
-    );
-  }
-}
+  return (
+    <Appdiv>
+      <Searchbar onSubmit={onSubmit} />
+      {isLoading && <Loader />}
+      {(errorMassage || inputEmpty || noImageMassege) && (
+        <NoImage>{`${msg}`}</NoImage>
+      )}
+      {isHits && <ImageGallery hits={hits} onOpenModal={onOpenModal} />}
+      {isHits && <Button disabled={btnActive} onClick={loadMore} />}
+      {modalOpen && <Popap src={src} tags={tags} onClose={onCloseModal} />}
+    </Appdiv>
+  );
+};

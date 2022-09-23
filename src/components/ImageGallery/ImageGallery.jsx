@@ -5,9 +5,9 @@ import PropTypes from 'prop-types';
 import { ImageGalleryContainer } from './ImageGallery.styled';
 import ImageGalleryItem from 'components/ImageGalleryItem/ImageGalleryItem';
 
-export class ImageGallery extends Component {
-  prepareList = hits => {
-    const { onOpenModal } = this.props;
+export const ImageGallery = props => {
+  const prepareList = hits => {
+    const { onOpenModal } = props;
     const list = (
       <ImageGalleryContainer>
         {hits.map((hit, index) => {
@@ -25,13 +25,10 @@ export class ImageGallery extends Component {
     return list;
   };
 
-  render() {
-    const { hits } = this.props;
-    const { prepareList } = this;
-    const allItems = prepareList(hits);
-    return allItems;
-  }
-}
+  const { hits } = props;
+  const allItems = prepareList(hits);
+  return allItems;
+};
 
 ImageGallery.propTypes = {
   hits: PropTypes.array,

@@ -1,53 +1,55 @@
-import React, { Component } from 'react';
 import { Overlay, Modal } from './Modalstyled';
 import { createPortal } from 'react-dom';
 import Loader from 'components/Loader/Loader';
 import PropTypes from 'prop-types';
+import { useState } from 'react';
+import { useEffect } from 'react';
 
 const modalRoot = document.getElementById('modal-root');
 
-export default class Popap extends Component {
-  state = {
-    isLoading: true,
-  };
-  componentDidMount() {
-    document.addEventListener('keydown', this.closeModal);
-  }
-  componentWillUnmount() {
-    document.removeEventListener('keydown', this.closeModal);
-  }
-  closeModal = e => {
+const Popap = props => {
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    document.addEventListener('keydown', closeModal);
+    return () => {
+      document.removeEventListener('keydown', closeModal);
+    };
+  }, []);
+
+  const closeModal = e => {
     const { currentTarget, target, code } = e;
-    const { onClose } = this.props;
+    const { onClose } = props;
 
     if (currentTarget === target || code === 'Escape') {
       onClose();
     }
   };
 
-  handleImageLoaded = () => {
-    this.setState({ isLoading: false });
+  const handleImageLoaded = () => {
+    setIsLoading(false);
   };
-  render() {
-    const { src, tags } = this.props;
-    const { closeModal } = this;
-    const instance = (
-      <Overlay onClick={closeModal}>
-        <Modal>
-          {this.state.isLoading && <Loader />}
-          <img
-            src={src}
-            alt={`Open large Foto ${tags}`}
-            onLoad={this.handleImageLoaded}
-            onError={this.handleImageLoaded}
-          />
-        </Modal>
-      </Overlay>
-    );
 
-    return createPortal(instance, modalRoot);
-  }
-}
+  const { src, tags } = props;
+
+  const instance = (
+    <Overlay onClick={closeModal}>
+      <Modal>
+        {isLoading && <Loader />}
+        <img
+          src={src}
+          alt={`Open large Foto ${tags}`}
+          onLoad={handleImageLoaded}
+          onError={handleImageLoaded}
+        />
+      </Modal>
+    </Overlay>
+  );
+
+  return createPortal(instance, modalRoot);
+};
+
+export default Popap;
 
 Popap.propTypes = {
   isLoading: PropTypes.bool,
