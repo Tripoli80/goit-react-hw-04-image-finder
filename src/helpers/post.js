@@ -13,7 +13,8 @@ async function getHits({ qwery, page }) {
     const hits = await axios.get(URL, {
       params: parameters,
     });
-    return hits.data.hits;
+
+    return{ hitsUpdate:hits.data.hits,  totalHits: hits.data.totalHits};
   } catch (error) {
     console.error(error);
   }

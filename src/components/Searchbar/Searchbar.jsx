@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+
 import {
   Search,
   Form,
@@ -18,6 +20,7 @@ export class Searchbar extends Component {
     const { onSubmit } = this.props;
     onSubmit(this.state.curentName);
   };
+
   render() {
     const { submitForm, onChangeName } = this;
     return (
@@ -38,3 +41,28 @@ export class Searchbar extends Component {
     );
   }
 }
+
+Searchbar.propTypes = {
+  onSubmit: PropTypes.func
+
+  // isLoading: PropTypes.bool,
+  // qwery: PropTypes.string,
+  // hits: PropTypes.arrayOf(
+  //   PropTypes.exact({
+  //     id: PropTypes.string.isRequired,
+  //     type: PropTypes.string.isRequired,
+  //     currency: PropTypes.string.isRequired,
+  //     amount: PropTypes.string.isRequired,
+  //   })
+  // ),
+  // page: PropTypes.number,
+  // error: PropTypes.bool,
+  // isLoading: PropTypes.bool,
+  // modalOpen: PropTypes.bool,
+  // src:  PropTypes.string,
+  // tags:  PropTypes.string,
+  // totalHits:  PropTypes.number,
+
+
+};
+
