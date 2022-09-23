@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Overlay, Modal } from './Modalstyled';
 import { createPortal } from 'react-dom';
 import Loader from 'components/Loader/Loader';
+import PropTypes from 'prop-types';
 
 const modalRoot = document.getElementById('modal-root');
 
@@ -30,8 +31,7 @@ export default class Popap extends Component {
   render() {
     const { src, tags } = this.props;
     const { closeModal } = this;
-
-    return createPortal(
+    const instance = (
       <Overlay onClick={closeModal}>
         <Modal>
           {this.state.isLoading && <Loader />}
@@ -42,8 +42,16 @@ export default class Popap extends Component {
             onError={this.handleImageLoaded}
           />
         </Modal>
-      </Overlay>,
-      modalRoot
+      </Overlay>
     );
+
+    return createPortal(instance, modalRoot);
   }
 }
+
+Popap.propTypes = {
+  isLoading: PropTypes.bool,
+  src: PropTypes.string.isRequired,
+  tags: PropTypes.string,
+  onClose: PropTypes.func,
+};

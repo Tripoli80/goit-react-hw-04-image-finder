@@ -24,5 +24,9 @@ const Btn = styled.button`
   :focus {
     background-color: #303f9f;
   }
+
+  :disabled {
+    background-color: #616161;
+  }
 `;
-export {Btn}
+export { Btn };
