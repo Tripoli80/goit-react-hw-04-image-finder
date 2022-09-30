@@ -23,12 +23,11 @@ export const App = () => {
   const [totalHits, setTotalHits] = useState(0);
 
   useEffect(() => {
-    const inputEmpty = !Boolean(qwery.trim(' '));
+    const inputEmpty = Boolean(qwery.trim(' '));
     //смотрю быль ли запрос новый из вне и если да вношу в стейт чем вызываю перезапус этой функции
-    if (inputEmpty) {
+    if (!inputEmpty) {
       return;
     }
-    console.log('sent new post');
     fetchPost({ page: page, qwery: qwery });
   }, [qwery, page]);
 
@@ -42,19 +41,21 @@ export const App = () => {
     setIsLoading(true);
 
     try {
-      const { hitsUpdate, totalHits } = await getHits({
+      const { hitsToUpdate, totalHits } = await getHits({
         qwery: qwery,
         page: page,
       });
-      if (!hitsUpdate) {
-        throw new Error();
+      if (!hitsToUpdate.length) {
+        // якщо зробив би так як ви сказали то тоді не зміг бы вивеси помилку про те що зображення не знайдені. чи перероблювати лрогыку внизу
+        //  просто видаляю. а якщо помилка з беку  - тоді пишу про щось не так на  60  строці
       }
       setHits(prevHits => {
-        const newHits = [...prevHits, ...hitsUpdate];
+        const newHits = [...prevHits, ...hitsToUpdate];
         return newHits;
       });
       setTotalHits(totalHits);
     } catch (error) {
+      console.log(error);
       setError(true);
     } finally {
       setIsLoading(false);
@@ -77,7 +78,6 @@ export const App = () => {
   };
 
   const onSubmit = newName => {
-    console.log('newName', newName, qwery);
     if (qwery !== newName) {
       setQwery(newName);
       setHits([]);
@@ -86,7 +86,7 @@ export const App = () => {
   };
   const btnActive = hits.length >= totalHits;
   const errorMassage = error && !isLoading;
-  const inputEmpty = !Boolean(qwery.trim(' '));
+  const inputEmpty = !Boolean(qwery.trim());
   const isHits = Boolean(hits.length) && !inputEmpty;
   const noImageMassege = !inputEmpty && !isHits && !error && !isLoading;
   let msg;
@@ -102,7 +102,7 @@ export const App = () => {
         <NoImage>{`${msg}`}</NoImage>
       )}
       {isHits && <ImageGallery hits={hits} onOpenModal={onOpenModal} />}
-      {isHits && <Button disabled={btnActive} onClick={loadMore} />}
+      {isHits && !btnActive && <Button onClick={loadMore} />}
       {modalOpen && <Popap src={src} tags={tags} onClose={onCloseModal} />}
     </Appdiv>
   );

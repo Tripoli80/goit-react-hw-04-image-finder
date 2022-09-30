@@ -14,7 +14,7 @@ async function getHits({ qwery, page }) {
       params: parameters,
     });
 
-    return{ hitsUpdate:hits.data.hits,  totalHits: hits.data.totalHits};
+    return{ hitsToUpdate:hits.data.hits,  totalHits: hits.data.totalHits};
   } catch (error) {
     console.error(error);
   }
