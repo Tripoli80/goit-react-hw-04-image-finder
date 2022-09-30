@@ -1,4 +1,3 @@
-import React, { Component } from 'react';
 import { ThreeCircles } from 'react-loader-spinner';
 // import 'react-loader-spinner/dist/loader/css/react-spinner-loader.css';
 const Loader = () => {
