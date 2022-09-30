@@ -15,7 +15,7 @@ const Popap = props => {
     return () => {
       document.removeEventListener('keydown', closeModal);
     };
-  }, []);
+  });
 
   const closeModal = e => {
     const { currentTarget, target, code } = e;
